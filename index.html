@@ -2349,7 +2349,7 @@ footer {
         <div class="map-overlay map-overlay-top">
           <span class="map-stat-chip"><span class="chip-dot"></span><strong>5 km</strong> &amp; <strong>10 km</strong> catchment</span>
           <span class="map-stat-chip"><span class="chip-dot"></span><strong>2</strong> residences</span>
-          <span class="map-stat-chip"><span class="chip-dot"></span><strong>1.1 km</strong> to Wangsa Walk</span>
+          <span class="map-stat-chip"><span class="chip-dot"></span><strong>1.2 km</strong> to Wangsa Walk</span>
         </div>
         <div class="map-overlay map-overlay-bottom">
           <div class="map-legend-card">
@@ -2407,7 +2407,7 @@ footer {
     <div class="res-info">
       <div class="res-name">M <em>Adora</em></div>
       <div class="res-vibe">~ closest to campus, low density, walk to class ~</div>
-      <div class="res-desc">Mah Sing’s M Adora rises in two 31-storey towers over Jalan Wangsa Melawati 1, 677 units handed over ahead of schedule in 2024 on a low-density 4.5-acre parcel. Thirty-five facilities crown it — an Olympic-length horizon pool, a cantilevered glass gymnasium fitted out with Technogym, and a sky bridge strung across Level 29 with the Melawati hills beyond. At 1.3 km it is the closer of the two addresses to campus: about twenty minutes on foot, five by car. Rooms are fully furnished and managed end to end by BeLive.</div>
+      <div class="res-desc">Mah Sing’s M Adora rises in two 31-storey towers over Jalan Wangsa Melawati 1, 677 units handed over ahead of schedule in 2024 on a low-density 4.5-acre parcel. Thirty-five facilities crown it — an Olympic-length horizon pool, a cantilevered glass gymnasium fitted out with Technogym, and a sky bridge strung across Level 29 with the Melawati hills beyond. At 1.6 km it is the closer of the two addresses to campus: about twenty minutes on foot, five by car. Rooms are fully furnished and managed end to end by BeLive.</div>
       <div class="res-stats" id="madora-stats"></div>
       <div class="res-facilities" id="madora-facilities"></div>
       <div class="res-facility-photos four-up">
@@ -2428,7 +2428,7 @@ footer {
     <div class="res-info">
       <div class="res-name">MH <em>Platinum 2</em></div>
       <div class="res-vibe">~ newest keys, courtyard living, LRT-linked ~</div>
-      <div class="res-desc">The newer keys of the two. MH Group and Platinum Victory arranged three 40-storey blocks and 1,254 units around a central courtyard on 4.72 acres of Jalan Usahawan 6, completed in June 2025. The facility list reads like a resort brief — swimming and spa pools, sauna, yoga deck, hammock garden, sunset deck and a jogging track threaded through the landscaping. Setapak Central, AEON Alpha Angle and Wangsa Maju LRT are minutes away; campus is 2.1 km north along Jalan Genting Klang. Rooms are fully furnished and managed end to end by BeLive.</div>
+      <div class="res-desc">The newer keys of the two. MH Group and Platinum Victory arranged three 40-storey blocks and 1,254 units around a central courtyard on 4.72 acres of Jalan Usahawan 6, completed in June 2025. The facility list reads like a resort brief — swimming and spa pools, sauna, yoga deck, hammock garden, sunset deck and a jogging track threaded through the landscaping. Setapak Central, AEON Alpha Angle and Wangsa Maju LRT are minutes away; campus is 2.0 km north along Jalan Genting Klang. Rooms are fully furnished and managed end to end by BeLive.</div>
       <div class="res-stats" id="mhplatinum2-stats"></div>
       <div class="res-facilities" id="mhplatinum2-facilities"></div>
       <div class="res-facility-photos">
@@ -2478,7 +2478,7 @@ footer {
     <div class="route-panel active" data-route="madora">
       <div class="route-summary">
         <div><div class="v">5&ndash;20 min</div><div class="l">Typical journey</div></div>
-        <div><div class="v">1.3 km</div><div class="l">To campus</div></div>
+        <div><div class="v">1.6 km</div><div class="l">To campus</div></div>
         <div><div class="v">Walk or bus</div><div class="l">Nearest station</div></div>
       </div>
       <p class="route-steps">M Adora sits one neighbourhood east of campus. It is roughly a <strong>20-minute walk</strong> west along Jalan Wangsa Melawati onto Jalan Genting Kelang, or about <strong>five minutes</strong> by car, RapidKL bus or the TAR UMT shuttle. No rail, no transfers &mdash; the shorter of the two commutes.</p>
@@ -2486,7 +2486,7 @@ footer {
     <div class="route-panel" data-route="mhplatinum2">
       <div class="route-summary">
         <div><div class="v">8&ndash;15 min</div><div class="l">Typical journey</div></div>
-        <div><div class="v">2.1 km</div><div class="l">To campus</div></div>
+        <div><div class="v">2.0 km</div><div class="l">To campus</div></div>
         <div><div class="v">Wangsa Maju LRT</div><div class="l">Nearest station</div></div>
       </div>
       <p class="route-steps">Campus is a straight run <strong>north up Jalan Genting Klang</strong> &mdash; about <strong>eight minutes</strong> by car, or a RapidKL bus along the same corridor. <strong>Wangsa Maju LRT</strong> on the Kelana Jaya Line is roughly 1.5 km from the lobby for trips into the city centre.</p>
@@ -3098,7 +3098,11 @@ window.addEventListener('load', () => {
   // TAR UMT — Tunku Abdul Rahman University of Management and Technology, main
   // campus, Jalan Genting Kelang, Setapak, 53300 Kuala Lumpur. This sets the map
   // centre, both catchment rings and every computed distance.
-  const CAMPUS = [3.215860, 101.730490];
+  // Taken from the campus Plus Code 6P8G+4J Kuala Lumpur, which decodes to the
+  // cell 3.215250-3.215375 N, 101.726500-101.726625 E; this is its centre. It
+  // supersedes an earlier locality-level guess that sat about 440 m east, so
+  // every distance written into the copy below moved with it.
+  const CAMPUS = [3.215313, 101.726562];
 
   const CATEGORIES = {
     residence: {
@@ -3121,7 +3125,7 @@ window.addEventListener('load', () => {
     commercial: {
       label: 'Commercial', icon: '🛍️', color: '#14B8A6',
       places: 'Wangsa Walk · AEON Alpha Angle · Setapak Central · Melawati Mall',
-      stat: '<strong>Wangsa Walk</strong> 1.1 km from campus',
+      stat: '<strong>Wangsa Walk</strong> 1.2 km from campus',
     },
     employment: {
       label: 'Employment', icon: '💼', color: '#F59E0B',
