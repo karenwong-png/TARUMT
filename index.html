@@ -562,6 +562,9 @@ section { padding: 100px 40px; position: relative; }
 /* Two photos sit side by side and drop to a stack on a narrow screen. */
 .built-together-photos.two-up { grid-template-columns: 1fr 1fr; gap: 20px; }
 .built-together-photos.two-up figure { max-width: none; }
+/* A lone photo is shown whole, in its native 4:3, rather than cropped to the
+   wider frame the paired layout uses. */
+.built-together-photos.one-up figure { aspect-ratio: 4 / 3; max-width: 720px; }
 @media (max-width: 768px) {
   .built-together-card { padding: 32px 22px; text-align: center; }
   .built-together-top { grid-template-columns: 1fr; gap: 24px; }
@@ -2236,6 +2239,9 @@ footer {
         <h2>Built Together with <em>TAR UMT.</em></h2>
         <p>An exclusive co-living programme co-designed by BeLive and Tunku Abdul Rahman University of Management and Technology — built around how TAR UMT students actually live, study and unwind around Setapak and Wangsa Maju.</p>
       </div>
+    </div>
+    <div class="built-together-photos one-up">
+      <figure><img src="BeLive_TARUMT_Partnership_MoA.jpg" alt="The TAR UMT and BeLive Ventures teams at the signing of the Memorandum of Agreement, hosted by the TAR UMT Centre for Business Incubation and Entrepreneurial Ventures" loading="lazy" decoding="async"></figure>
     </div>
   </div>
 </section>
