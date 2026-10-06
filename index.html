@@ -1387,9 +1387,31 @@ section { padding: 100px 40px; position: relative; }
 }
 
 .rooms-carousel { position: relative; }
-.rooms-viewport { overflow: hidden; }
-.rooms-track { display: flex; gap: 20px; transition: transform 0.45s cubic-bezier(.22,.61,.36,1); will-change: transform; }
-.rooms-track .room-card { flex: 0 0 calc((100% - 40px) / 3); }
+/* The viewport is a real scroll container, so touch swipe and trackpad scroll
+   work on their own and the arrows are an enhancement rather than the only way
+   through. Vertical padding leaves room for the cards' 4px hover lift, which
+   overflow-y would otherwise clip, and for the scrollbar beneath them. */
+.rooms-viewport {
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 6px 0 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.35) rgba(255,255,255,0.08);
+}
+.rooms-viewport::-webkit-scrollbar { height: 8px; }
+.rooms-viewport::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.08); border-radius: 100px;
+}
+.rooms-viewport::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.35); border-radius: 100px;
+}
+.rooms-viewport::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+.rooms-track { display: flex; gap: 20px; }
+.rooms-track .room-card { flex: 0 0 calc((100% - 40px) / 3); scroll-snap-align: start; }
+@media (prefers-reduced-motion: reduce) {
+  .rooms-viewport { scroll-behavior: auto; }
+}
 .carousel-arrow {
   position: absolute; top: calc(50% - 24px); transform: translateY(-50%);
   width: 44px; height: 44px; border-radius: 50%;
@@ -2779,6 +2801,16 @@ const roomData = {
     ],
   },
 };
+// Rooms are listed cheapest first everywhere they appear - the carousel and the
+// calculator's room dropdown - so the first card a visitor meets is the rate
+// quoted in the hero's "From / month" stat. Sorting the data once, here, keeps
+// every consumer in step and survives a change to the rate card, because the
+// order is derived from the price rather than written out by hand.
+const rateOf = (room) => parseFloat(String(room.now).replace(/[^0-9.]/g, '')) || 0;
+Object.values(roomData).forEach(d => {
+  if (Array.isArray(d.rooms)) d.rooms.sort((a, b) => rateOf(a) - rateOf(b));
+});
+
 const specsHtml = d => (d.specs || []).map(x =>
   `<div class="res-stat"><div class="v">${x.v}</div><div class="l">${x.l}</div></div>`).join('');
 const facilitiesHtml = d => (d.facilities || [])
@@ -2847,7 +2879,7 @@ function renderRooms(key) {
       <button class="carousel-arrow next" aria-label="Next rooms">›</button>
     </div>
   `;
-  initRoomsCarousel(d.rooms.length);
+  initRoomsCarousel();
 
   // Hide the shared-spaces block unless this residence has its own photos, so
   // one property's common areas are never shown under another's name.
@@ -2863,41 +2895,58 @@ function renderRooms(key) {
   }
 }
 
-let roomsCarouselResizeHandler = null;
-function initRoomsCarousel(total) {
+let roomsCarouselCleanup = null;
+function initRoomsCarousel() {
   const root = roomsStrip.querySelector('.rooms-carousel');
   if (!root) return;
-  const track = root.querySelector('.rooms-track');
+  const viewport = root.querySelector('.rooms-viewport');
   const prev = root.querySelector('.carousel-arrow.prev');
   const next = root.querySelector('.carousel-arrow.next');
-  let index = 0;
+  if (!viewport || !prev || !next) return;
 
-  const visibleCount = () => {
-    if (window.innerWidth <= 540) return 1;
-    if (window.innerWidth <= 900) return 2;
-    return 3;
+  // renderRooms replaces the whole strip, so retire the previous instance's
+  // window listener before this one starts adding its own.
+  if (roomsCarouselCleanup) roomsCarouselCleanup();
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // The arrows' disabled state is read from the scroll position, never from an
+  // index counter, so it stays correct after a swipe or a trackpad scroll just
+  // as it does after a click. The epsilon absorbs sub-pixel scroll offsets.
+  const EPS = 2;
+  const sync = () => {
+    const max = viewport.scrollWidth - viewport.clientWidth;
+    prev.disabled = viewport.scrollLeft <= EPS;
+    next.disabled = viewport.scrollLeft >= max - EPS;
   };
 
-  const update = () => {
-    const v = visibleCount();
-    const maxIndex = Math.max(0, total - v);
-    if (index > maxIndex) index = maxIndex;
-    const card = track.querySelector('.room-card');
-    const cardWidth = card ? card.getBoundingClientRect().width : 0;
-    const gap = 20;
-    track.style.transform = `translateX(-${index * (cardWidth + gap)}px)`;
-    prev.disabled = index <= 0;
-    next.disabled = index >= maxIndex;
+  // One card plus its gap per press, which lands exactly on a snap point.
+  const step = () => {
+    const card = viewport.querySelector('.room-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : viewport.clientWidth;
+    return cardWidth + 20;
+  };
+  const nudge = (dir) => viewport.scrollBy({
+    left: dir * step(),
+    behavior: reduced.matches ? 'auto' : 'smooth',
+  });
+
+  prev.addEventListener('click', () => nudge(-1));
+  next.addEventListener('click', () => nudge(1));
+
+  let raf = 0;
+  const onScroll = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; sync(); });
+  };
+  viewport.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', sync);
+  roomsCarouselCleanup = () => {
+    viewport.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', sync);
   };
 
-  prev.addEventListener('click', () => { index = Math.max(0, index - 1); update(); });
-  next.addEventListener('click', () => { index = index + 1; update(); });
-
-  if (roomsCarouselResizeHandler) window.removeEventListener('resize', roomsCarouselResizeHandler);
-  roomsCarouselResizeHandler = update;
-  window.addEventListener('resize', roomsCarouselResizeHandler);
-
-  requestAnimationFrame(update);
+  requestAnimationFrame(sync);
 }
 
 function activateResidence(key) {
@@ -2964,7 +3013,6 @@ activateResidence('madora');
     international: { label: 'International student', local: false },
   };
   const fmt = (n) => 'RM ' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const rentOf = (room) => parseFloat(String(room.now).replace(/[^0-9.]/g, '')) || 0;
 
   function populateRooms() {
     const rooms = roomData[condoSel.value].rooms;
@@ -2976,7 +3024,7 @@ activateResidence('madora');
     const isLocal = who.local;
     const rooms = roomData[condoSel.value].rooms;
     const room = rooms[roomSel.value] || rooms[0];
-    const baseRent = rentOf(room);
+    const baseRent = rateOf(room);
     const rent = baseRent + FEES.rentalAddOn;
     const wantsCarpark = carparkSel.value === 'yes';
     const carpark = wantsCarpark ? FEES.carPark : 0;
