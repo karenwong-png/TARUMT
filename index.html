@@ -120,6 +120,22 @@ nav ul a:hover::after { transform: scaleX(1); }
 .cta-btn .arrow { transition: transform 0.25s; }
 .cta-btn:hover .arrow { transform: translateX(4px); }
 
+/* Between the link breakpoint and a comfortable desktop the row is tight, so
+   trim the padding, the link gap and the link size rather than let items touch. */
+@media (max-width: 1440px) {
+  nav.top { padding-left: 28px; padding-right: 28px; }
+  nav ul { gap: 20px; }
+  nav ul a { font-size: 13px; }
+  .lang-switch { margin: 0 10px; }
+  /* The brand block is as wide as its tagline, which is longer in every
+     translation than the English, so trim the lock-up here too. */
+  .brand img.logo-belive, .brand img.logo-vitrox { height: 30px; }
+  .brand-tagline { font-size: 9px; letter-spacing: 0.12em; }
+}
+/* Below this the brand, the language control and the CTA need the whole row. */
+@media (max-width: 1200px) {
+  nav ul { display: none; }
+}
 @media (max-width: 768px) {
   nav.top { padding: 12px 16px; gap: 10px; }
   nav ul { display: none; }
@@ -2156,7 +2172,7 @@ footer {
 .lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
 /* ---------- LANGUAGE SWITCHER ---------- */
-.lang-switch { display: flex; align-items: center; margin-left: auto; margin-right: 14px; }
+.lang-switch { display: flex; align-items: center; margin: 0 14px; }
 .lang-switch select {
   appearance: none; -webkit-appearance: none;
   background: transparent url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%231a1a1a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 10px center/10px 7px;
@@ -2182,7 +2198,6 @@ html[dir="rtl"] .rooms-viewport { direction: ltr; }
    these: the other value slots mix numbers with translated words, and forcing
    LTR there would mis-order the Arabic. */
 html[dir="rtl"] .hero-stats .num { direction: ltr; unicode-bidi: isolate; }
-html[dir="rtl"] .lang-switch { margin-left: 0; margin-right: auto; }
 html[dir="rtl"] .lang-switch select { padding: 8px 14px 8px 30px; background-position: left 10px center; }
 @media (max-width: 900px) {
   .lang-switch select { padding: 6px 26px 6px 10px; font-size: 12px; }
@@ -2194,9 +2209,9 @@ html[dir="rtl"] .lang-switch select { padding: 8px 14px 8px 30px; background-pos
    list still shows every language in full, in its own script - and the brand and
    CTA each give back a few pixels so the row fits with the longest label. */
 @media (max-width: 540px) {
-  .lang-switch { margin-right: 6px; }
+  .lang-switch { margin: 0 6px; }
   .lang-switch select {
-    max-width: 72px; padding: 6px 18px 6px 7px; font-size: 11px;
+    max-width: 62px; padding: 6px 16px 6px 6px; font-size: 11px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     background-position: right 5px center; background-size: 8px 6px;
   }
